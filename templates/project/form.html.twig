@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'project.add'|trans }}{% endblock %}
+{% block body %}
+<h1 class="h3 mb-3">{{ project.id ? project.name : 'project.add'|trans }}</h1>
+{{ form_start(form, {attr: {class: 'js-project-form'}}) }}
+    {{ form_row(form.name) }}
+    <div class="row">
+        <div class="col-md-6">{{ form_row(form.startedOn) }}</div>
+        <div class="col-md-6">{{ form_row(form.endedOn) }}</div>
+    </div>
+    {{ form_row(form.description, {attr: {class: 'js-markdown'}}) }}
+    <label class="form-label">{{ 'project.tags'|trans }}</label>
+    <input id="project-tags" class="mb-3">
+    {{ form_widget(form.tagsJson) }}
+    <div class="d-flex gap-2">
+        <button class="btn btn-primary">{{ 'action.save'|trans }}</button>
+        {% if project.id %}
+            <button class="btn btn-outline-danger" form="delete-project">{{ 'action.delete'|trans }}</button>
+        {% endif %}
+    </div>
+{{ form_end(form) }}
+{% if project.id %}
+    <form id="delete-project" method="post" action="{{ path('project_delete', {id: project.id}) }}" class="d-none"></form>
+{% endif %}
+{% endblock %}

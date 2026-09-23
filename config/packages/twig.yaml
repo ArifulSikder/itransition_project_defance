@@ -1,0 +1,10 @@
+twig:
+    file_name_pattern: '*.twig'
+    form_themes: ['bootstrap_5_layout.html.twig']
+    globals:
+        cloudinary_cloud_name: '%env(CLOUDINARY_CLOUD_NAME)%'
+        cloudinary_upload_preset: '%env(CLOUDINARY_UPLOAD_PRESET)%'
+
+when@test:
+    twig:
+        strict_variables: true

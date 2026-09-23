@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ position.id ? 'action.edit'|trans : 'position.create'|trans }}{% endblock %}
+{% block body %}
+<h1 class="h3 mb-3">{{ position.id ? position.title : 'position.create'|trans }}</h1>
+{{ form_start(form, {attr: {class: 'js-position-form'}}) }}
+<div class="row g-3">
+    <div class="col-md-6">{{ form_row(form.title) }}</div>
+    <div class="col-md-4">{{ form_row(form.company) }}</div>
+    <div class="col-md-2">{{ form_row(form.level) }}</div>
+    <div class="col-12">{{ form_row(form.shortDescription) }}</div>
+    <div class="col-md-6">{{ form_row(form.publicAccess) }}</div>
+    <div class="col-md-6">{{ form_row(form.maxProjects) }}</div>
+</div>
+
+<h2 class="h5 mt-4">{{ 'position.template'|trans }}</h2>
+<p class="text-secondary small">{{ 'position.template_help'|trans }}</p>
+<div class="row g-2 mb-2">
+    <div class="col-md-4">
+        <input class="form-control" id="attr-prefix" placeholder="{{ 'attribute.lookup'|trans }}">
+    </div>
+    <div class="col-md-4">
+        <select class="form-select" id="attr-category">
+            <option value="">{{ 'attribute.any_category'|trans }}</option>
+            {% for category in attribute_categories %}
+                <option value="{{ category.value }}">{{ category.label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+<div id="attr-results" class="list-group mb-3"></div>
+<div class="table-responsive border rounded-3 mb-4">
+    <table class="table mb-0" id="template-table">
+        <thead><tr><th>{{ 'attribute.name'|trans }}</th><th>{{ 'attribute.type'|trans }}</th><th></th></tr></thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<h2 class="h5">{{ 'position.rules'|trans }}</h2>
+<div id="rules-box" class="mb-3"></div>
+<button class="btn btn-outline-secondary btn-sm mb-4" type="button" id="add-rule">{{ 'position.add_rule'|trans }}</button>
+
+<h2 class="h5">{{ 'position.project_tags'|trans }}</h2>
+<input id="project-tags" class="mb-4" value="">
+
+{{ form_widget(form.expectedVersion) }}
+{{ form_widget(form.templateJson) }}
+{{ form_widget(form.rulesJson) }}
+{{ form_widget(form.tagsJson) }}
+<button class="btn btn-primary">{{ 'action.save'|trans }}</button>
+{{ form_end(form) }}
+{% endblock %}

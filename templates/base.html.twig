@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}" data-bs-theme="{{ app.request.attributes.get('_theme')|default('light') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token('app') }}">
+    <title>{% block title %}CV Hub{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><text y='1.1em' font-size='96'>📄</text></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/easymde@2.20.0/dist/easymde.min.css" rel="stylesheet">
+    {% if app.request.locale == 'bn' %}
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    {% endif %}
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    {% endblock %}
+</head>
+<body>
+<nav class="navbar navbar-expand-lg border-bottom sticky-top bg-body">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-semibold" href="{{ path('app_home') }}">CV Hub</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-3">
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_home') }}">{{ 'nav.home'|trans }}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('position_index') }}">{{ 'nav.positions'|trans }}</a></li>
+                {% if is_granted('ROLE_RECRUITER') %}
+                    <li class="nav-item"><a class="nav-link" href="{{ path('attribute_index') }}">{{ 'nav.library'|trans }}</a></li>
+                {% endif %}
+                {% if is_granted('ROLE_USER') %}
+                    <li class="nav-item"><a class="nav-link" href="{{ path('profile_me') }}">{{ 'nav.profile'|trans }}</a></li>
+                {% endif %}
+                {% if is_granted('ROLE_ADMIN') %}
+                    <li class="nav-item"><a class="nav-link" href="{{ path('admin_users') }}">{{ 'nav.users'|trans }}</a></li>
+                {% endif %}
+            </ul>
+            <form class="d-flex flex-grow-1 my-2 my-lg-0" action="{{ path('app_search') }}" method="get" role="search">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input class="form-control" type="search" name="q" value="{{ app.request.query.get('q') }}" placeholder="{{ 'search.placeholder'|trans }}" aria-label="{{ 'search.placeholder'|trans }}">
+                </div>
+            </form>
+            <ul class="navbar-nav ms-lg-3 align-items-lg-center">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">{{ app.request.locale|upper }}</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{{ path('preferences_locale', {locale: 'en'}) }}">English</a></li>
+                        <li><a class="dropdown-item" href="{{ path('preferences_locale', {locale: 'bn'}) }}">বাংলা</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    {% set theme = app.request.attributes.get('_theme')|default('light') %}
+                    <a class="nav-link" href="{{ path('preferences_theme', {theme: theme == 'dark' ? 'light' : 'dark'}) }}" title="{{ 'nav.theme'|trans }}">
+                        <i class="bi {{ theme == 'dark' ? 'bi-sun' : 'bi-moon' }}"></i>
+                    </a>
+                </li>
+                {% if app.user %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">{{ app.user.fullName }}</a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ path('profile_me') }}">{{ 'nav.profile'|trans }}</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ path('app_logout') }}" method="post">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                                    <button class="dropdown-item">{{ 'nav.logout'|trans }}</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">{{ 'nav.login'|trans }}</a></li>
+                    <li class="nav-item"><a class="btn btn-primary btn-sm ms-lg-2" href="{{ path('app_register') }}">{{ 'nav.register'|trans }}</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container py-4">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message|trans }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    <div id="lock-conflict" class="alert alert-warning align-items-center justify-content-between gap-2" hidden>
+        <span class="js-lock-msg">{{ 'lock.conflict'|trans }}</span>
+        <button type="button" class="btn btn-sm btn-outline-secondary js-lock-reload">{{ 'lock.reload'|trans }}</button>
+    </div>
+    {% block body %}{% endblock %}
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/easymde@2.20.0/dist/easymde.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked@15.0.6/marked.min.js"></script>
+<script>
+    window.CVHUB = {
+        cloudName: {{ cloudinary_cloud_name|json_encode|raw }},
+        uploadPreset: {{ cloudinary_upload_preset|json_encode|raw }},
+        lookupUrl: {{ path('attribute_lookup')|json_encode|raw }},
+        tagSuggestUrl: {{ path('tag_suggest')|json_encode|raw }},
+        csrf: document.querySelector('meta[name="csrf-token"]').content
+    };
+</script>
+{% block javascripts %}
+    {{ importmap('app') }}
+{% endblock %}
+</body>
+</html>

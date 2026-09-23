@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #212529; }
+        h1 { font-size: 22px; margin: 0 0 4px; }
+        h2 { font-size: 14px; border-bottom: 1px solid #dee2e6; padding-bottom: 4px; margin: 18px 0 8px; }
+        .muted { color: #6c757d; }
+        .missing { color: #dc3545; }
+        .header { width: 100%; }
+        .header td { vertical-align: top; }
+        .qr { text-align: right; }
+        .qr img { width: 96px; height: 96px; }
+    </style>
+</head>
+<body>
+<table class="header">
+    <tr>
+        <td>
+            <h1>{{ cv.owner.fullName }}</h1>
+            <div>{{ cv.position.title }} · {{ cv.position.company }}</div>
+            <div class="muted">{{ cv.owner.location }} · {{ cv.owner.email }}</div>
+        </td>
+        <td class="qr">
+            <img src="{{ qr }}" alt="QR">
+            <div class="muted">{{ url }}</div>
+        </td>
+    </tr>
+</table>
+{% for section in assembled.sections %}
+    <h2>{{ section.title }}</h2>
+    {% for item in section.items %}
+        <p><strong>{{ item.definition.name }}:</strong>
+            {% if item.empty %}<span class="missing">Missing</span>{% else %}{{ item.display }}{% endif %}
+        </p>
+    {% endfor %}
+{% endfor %}
+{% if assembled.projects %}
+    <h2>Projects</h2>
+    {% for project in assembled.projects %}
+        <p><strong>{{ project.name }}</strong>
+            ({{ project.startedOn|date('Y-m') }} — {{ project.endedOn ? project.endedOn|date('Y-m') : 'present' }})</p>
+        {{ project.description|markdown_to_html }}
+    {% endfor %}
+{% endif %}
+</body>
+</html>

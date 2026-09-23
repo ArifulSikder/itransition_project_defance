@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'search.title'|trans }}{% endblock %}
+{% block body %}
+<h1 class="h3 mb-3">{{ 'search.title'|trans }}</h1>
+<div class="table-responsive border rounded-3">
+    <table class="table table-hover align-middle mb-0 js-data-table">
+        <thead>
+        <tr>
+            <th>{{ 'search.type'|trans }}</th>
+            <th>{{ 'search.result'|trans }}</th>
+            <th>{{ 'search.likes'|trans }}</th>
+            <th>{{ 'search.rank'|trans }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for hit in hits %}
+            <tr data-href="{{ hit.route }}">
+                <td>{{ ('search.types.' ~ hit.type)|trans }}</td>
+                <td>{{ hit.title }}</td>
+                <td>{% if hit.likes is defined %}{{ hit.likes }}{% else %}—{% endif %}</td>
+                <td>{{ hit.rank|number_format(3) }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="4" class="text-secondary">{{ q ? 'search.empty'|trans : 'search.hint'|trans }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

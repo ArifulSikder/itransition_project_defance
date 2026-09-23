@@ -1,0 +1,80 @@
+:root {
+    --cv-empty: #dc3545;
+}
+
+html[lang="bn"] body {
+    font-family: "Noto Sans Bengali", system-ui, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+}
+
+.table-toolbar {
+    position: sticky;
+    top: 4.2rem;
+    z-index: 20;
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.table-toolbar.is-visible {
+    display: flex !important;
+}
+
+.js-data-table tbody tr[data-href]:hover {
+    cursor: pointer;
+}
+
+.empty-value:not(.js-attr-field) {
+    color: var(--cv-empty);
+}
+
+.js-attr-field.empty-value .form-control,
+.js-attr-field.empty-value .form-select {
+    color: var(--cv-empty);
+    border-color: var(--cv-empty);
+}
+
+.preview-img {
+    max-width: 160px;
+    max-height: 160px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+}
+
+.image-drop {
+    cursor: pointer;
+    background: var(--bs-secondary-bg);
+}
+
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 0.9rem;
+    align-items: center;
+}
+
+.tag-cloud-item {
+    text-decoration: none;
+}
+
+.cv-paper {
+    max-width: 860px;
+}
+
+.js-cv-table th.js-sort {
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.js-cv-table th.js-sort.is-asc::after {
+    content: ' \2191';
+}
+
+.js-cv-table th.js-sort.is-desc::after {
+    content: ' \2193';
+}

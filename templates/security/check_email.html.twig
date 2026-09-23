@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'auth.check_email'|trans }}{% endblock %}
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <h1 class="h3 mb-3">{{ 'auth.check_email'|trans }}</h1>
+        <p>{{ 'auth.check_email_body'|trans({'%email%': email}) }}</p>
+        {% if devLink %}
+            <div class="alert alert-info">
+                <div class="fw-semibold mb-2">{{ 'auth.dev_link'|trans }}</div>
+                <a href="{{ devLink }}">{{ devLink }}</a>
+            </div>
+        {% endif %}
+        <p class="small text-secondary mb-0"><a href="{{ path('app_login') }}">{{ 'auth.login'|trans }}</a></p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'auth.register'|trans }}{% endblock %}
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <h1 class="h3 mb-3">{{ 'auth.register'|trans }}</h1>
+        {{ form_start(form) }}
+            {{ form_row(form.firstName) }}
+            {{ form_row(form.lastName) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.plainPassword) }}
+            <button class="btn btn-primary">{{ 'auth.create'|trans }}</button>
+        {{ form_end(form) }}
+        <div class="d-grid gap-2 mt-3">
+            <a class="btn btn-outline-danger" href="{{ path('connect_google') }}"><i class="bi bi-google"></i> {{ 'auth.google'|trans }}</a>
+            <a class="btn btn-outline-dark" href="{{ path('connect_github') }}"><i class="bi bi-github"></i> {{ 'auth.github'|trans }}</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

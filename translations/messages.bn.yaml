@@ -1,0 +1,169 @@
+nav:
+    home: হোম
+    positions: পদসমূহ
+    library: অ্যাট্রিবিউট লাইব্রেরি
+    profile: প্রোফাইল
+    users: ব্যবহারকারী
+    login: সাইন ইন
+    register: নিবন্ধন
+    logout: সাইন আউট
+    theme: থিম বদলান
+home:
+    title: সিভি হাব
+    hello: হ্যালো — সিভি হাব চালু আছে।
+    lead: নিয়োগকর্তারা পদের টেমপ্লেট তৈরি করেন। প্রার্থীরা পুনর্ব্যবহারযোগ্য অ্যাট্রিবিউট পূরণ করে নিজের মতো সিভি বানান।
+    latest: সাম্প্রতিক পদ
+    popular: সবচেয়ে জনপ্রিয় পদ
+    tags: প্রযুক্তির ট্যাগ
+stats:
+    cvs_24h: গত ২৪ ঘণ্টায় তৈরি সিভি
+    positions: পদ
+    candidates: প্রার্থী
+    recruiters: নিয়োগকর্তা
+    cvs_total: জমা দেওয়া সিভি
+search:
+    placeholder: পদ, মানুষ, অ্যাট্রিবিউট খুঁজুন…
+    title: অনুসন্ধানের ফলাফল
+    type: ধরন
+    result: ফলাফল
+    rank: র‍্যাঙ্ক
+    likes: পছন্দ
+    empty: এই অনুসন্ধানে কিছু মেলেনি।
+    hint: উপরের সার্চ বক্সে একটি বাক্যাংশ লিখুন।
+    types:
+        position: পদ
+        cv: সিভি
+        user: ব্যক্তি
+        attribute: অ্যাট্রিবিউট
+auth:
+    login: সাইন ইন
+    register: অ্যাকাউন্ট তৈরি করুন
+    email: ইমেইল
+    password: পাসওয়ার্ড
+    signin: সাইন ইন
+    create: অ্যাকাউন্ট তৈরি করুন
+    google: Google দিয়ে চালিয়ে যান
+    github: GitHub দিয়ে চালিয়ে যান
+    no_account: এখনো অ্যাকাউন্ট নেই?
+    confirm_required: সাইন ইন করার আগে ইমেইল নিশ্চিত করুন।
+    blocked: এই অ্যাকাউন্ট ব্লক করা হয়েছে।
+    check_email: ইমেইল দেখুন
+    check_email_body: আমরা %email% ঠিকানায় একটি নিশ্চিতকরণ লিংক পাঠিয়েছি। অ্যাকাউন্ট চালু করতে লিংকটি খুলুন।
+    dev_link: মেইল সেটআপ নেই, তাই নিশ্চিতকরণ লিংক এখানে
+    resend: আরেকটি নিশ্চিতকরণ ইমেইল দরকার?
+    resend_button: আবার পাঠান
+    confirmed: ইমেইল নিশ্চিত হয়েছে। আপনি সাইন ইন করেছেন।
+    invalid_token: এই নিশ্চিতকরণ লিংকটি ভুল অথবা আগেই ব্যবহার করা হয়েছে।
+action:
+    save: সংরক্ষণ
+    edit: সম্পাদনা
+    delete: মুছুন
+    remove: সরান
+    filter: ফিল্টার
+position:
+    title: শিরোনাম
+    company: প্রতিষ্ঠান
+    level: স্তর
+    updated: হালনাগাদ
+    cvs: সিভি
+    create: নতুন পদ
+    duplicate: অনুলিপি
+    export: এক্সেল রপ্তানি
+    public: সর্বজনীন
+    restricted: সীমিত
+    details: বিবরণ
+    discussion: আলোচনা
+    template: সিভি টেমপ্লেট
+    template_help: নামের শুরু ও বিভাগ দিয়ে অ্যাট্রিবিউট খুঁজে এই পদে যোগ করুন।
+    rules: প্রবেশাধিকারের নিয়ম
+    add_rule: নিয়ম যোগ করুন
+    project_tags: প্রকল্পের ট্যাগ
+    max_projects: সর্বোচ্চ প্রকল্প
+    any_level: যেকোনো স্তর
+    tag: ট্যাগ
+    no_access: আপনার বর্তমান প্রোফাইল অনুযায়ী এই পদে প্রবেশ সীমিত।
+attribute:
+    name: নাম
+    category: বিভাগ
+    type: ধরন
+    builtin: অন্তর্নির্মিত
+    create: নতুন অ্যাট্রিবিউট
+    lookup: একটি নাম লিখতে শুরু করুন…
+    any_category: যেকোনো বিভাগ
+    recent: সম্প্রতি ব্যবহৃত
+profile:
+    me: আমি
+    info: তথ্য
+    projects: প্রকল্প
+    cvs: সিভি
+    autosave_idle: সব পরিবর্তন সংরক্ষিত
+    badges: ব্যাজ
+    download_badges: এসভিজি ডাউনলোড
+badge:
+    projects: '%count%টি প্রকল্প'
+    cvs: '%count%টি সিভি'
+    likes: '%count%টি পছন্দ'
+    first: প্রথম সিভি
+    published: প্রকাশিত
+role:
+    admin: প্রশাসক
+    recruiter: নিয়োগকর্তা
+    candidate: প্রার্থী
+    user: ব্যবহারকারী
+project:
+    add: প্রকল্প যোগ করুন
+    name: নাম
+    period: সময়কাল
+    tags: ট্যাগ
+cv:
+    open: আমার সিভি খুলুন
+    create: সিভি তৈরি করুন
+    candidate: প্রার্থী
+    likes: পছন্দ
+    updated: হালনাগাদ
+    status: অবস্থা
+    published: প্রকাশিত
+    draft: খসড়া
+    publish: প্রকাশ করুন
+    unpublish: প্রকাশ বাতিল
+    print: প্রিন্ট
+    pdf: পিডিএফ ডাউনলোড
+    empty: মান নেই
+    filter: সিভি ফিল্টার করুন…
+    aggregates: সারাংশ
+    avg: গড়
+    min: সর্বনিম্ন
+    max: সর্বোচ্চ
+discussion:
+    post: পোস্ট
+    login: আলোচনায় যোগ দিতে সাইন ইন করুন।
+admin:
+    block: ব্লক
+    unblock: আনব্লক
+    role_candidate: প্রার্থী করুন
+    role_recruiter: নিয়োগকর্তা করুন
+    role_admin: অ্যাডমিন করুন
+    remove_admin: অ্যাডমিন সরান
+    roles: ভূমিকা
+    status: অবস্থা
+    blocked: ব্লক করা
+    active: সক্রিয়
+empty:
+    positions: এখনো কোনো পদ নেই।
+    cvs: দেখানোর মতো সিভি নেই।
+    tags: এখনো কোনো ট্যাগ নেই।
+    projects: এখনো কোনো প্রকল্প নেই।
+image:
+    drop: এখানে ছবি ফেলুন অথবা আপলোড করতে ক্লিক করুন
+yes: হ্যাঁ
+no: না
+lock:
+    conflict: অন্য কেউ এই তথ্য বদলেছেন। আবার লোড করে চেষ্টা করুন — পর্দায় করা সম্পাদনা নতুন সংস্করণের উপর সংরক্ষিত হয়নি।
+    reload: আবার লোড
+validation:
+    too_short: মানটি খুব ছোট।
+    too_long: মানটি খুব বড়।
+    pattern: মানটি প্রয়োজনীয় প্যাটার্নের সাথে মিলছে না।
+    numeric: মানটি সংখ্যা হতে হবে।
+    min: মানটি সর্বনিম্নের চেয়ে ছোট।
+    max: মানটি সর্বোচ্চের চেয়ে বড়।

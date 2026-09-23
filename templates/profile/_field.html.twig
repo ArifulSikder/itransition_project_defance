@@ -1,0 +1,57 @@
+{% set raw = value ? value.rawValue : '' %}
+{% set empty = raw is empty or raw == '{"from":"","to":""}' %}
+<div class="mb-3 js-attr-field {{ empty ? 'empty-value' }}" data-attribute-id="{{ definition.id }}" data-type="{{ definition.type.value }}">
+    <div class="d-flex justify-content-between">
+        <label class="form-label mb-1">{{ definition.name }}</label>
+        {% if removable|default(false) %}
+            <button type="button" class="btn btn-link btn-sm text-danger p-0 js-remove-attr">{{ 'action.remove'|trans }}</button>
+        {% endif %}
+    </div>
+    {% if (showDescription is not defined or showDescription) and definition.description %}<div class="form-text mt-0 mb-1">{{ definition.description }}</div>{% endif %}
+    {% if canEdit %}
+        {% if definition.type.value == 'text' %}
+            <textarea class="form-control js-attr-input js-markdown" rows="4" {% if definition.maxLength %}maxlength="{{ definition.maxLength }}"{% endif %}>{{ raw }}</textarea>
+        {% elseif definition.type.value == 'boolean' %}
+            <div class="form-check">
+                <input class="form-check-input js-attr-input" type="checkbox" {{ raw in ['1','true'] ? 'checked' }}>
+            </div>
+        {% elseif definition.type.value == 'choice' %}
+            <select class="form-select js-attr-input">
+                <option value="">—</option>
+                {% for option in definition.options %}
+                    <option value="{{ option }}" {{ raw == option ? 'selected' }}>{{ option }}</option>
+                {% endfor %}
+            </select>
+        {% elseif definition.type.value == 'date' %}
+            <input class="form-control js-attr-input" type="date" value="{{ raw }}">
+        {% elseif definition.type.value == 'numeric' %}
+            <input class="form-control js-attr-input" type="number" step="any" value="{{ raw }}" {% if definition.minValue is not null %}min="{{ definition.minValue }}"{% endif %} {% if definition.maxValue is not null %}max="{{ definition.maxValue }}"{% endif %}>
+        {% elseif definition.type.value == 'image' %}
+            <div class="js-image-field" data-value="{{ raw }}">
+                <input class="form-control js-attr-input" type="hidden" value="{{ raw }}">
+                <div class="image-drop border rounded-3 p-3 text-center {{ raw ? 'has-image' }}">
+                    {% if raw %}<img src="{{ raw }}" alt="" class="preview-img mb-2">{% endif %}
+                    <div>{{ 'image.drop'|trans }}</div>
+                </div>
+            </div>
+        {% elseif definition.type.value == 'period' %}
+            {% set period = raw ? raw|json_decode : {from: '', to: ''} %}
+            <div class="row g-2 js-period">
+                <div class="col"><input class="form-control" type="date" data-bound="from" value="{{ period.from|default('') }}"></div>
+                <div class="col"><input class="form-control" type="date" data-bound="to" value="{{ period.to|default('') }}"></div>
+            </div>
+        {% else %}
+            <input class="form-control js-attr-input" type="text" value="{{ raw }}" {% if definition.minLength %}minlength="{{ definition.minLength }}"{% endif %} {% if definition.maxLength %}maxlength="{{ definition.maxLength }}"{% endif %} {% if definition.pattern %}pattern="{{ definition.pattern }}"{% endif %}>
+        {% endif %}
+    {% else %}
+        <div class="{{ raw is empty ? 'empty-value' : '' }}">
+            {% if definition.type.value == 'image' and raw %}
+                <img src="{{ raw }}" alt="" class="preview-img">
+            {% elseif definition.type.value == 'text' and raw %}
+                {{ raw|markdown_to_html }}
+            {% else %}
+                {{ raw is empty ? 'cv.empty'|trans : raw }}
+            {% endif %}
+        </div>
+    {% endif %}
+</div>

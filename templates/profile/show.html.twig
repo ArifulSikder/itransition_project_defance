@@ -1,0 +1,134 @@
+{% extends 'base.html.twig' %}
+{% import '_table.html.twig' as tables %}
+{% block title %}{{ profile.fullName }}{% endblock %}
+{% block body %}
+<div class="d-flex align-items-center gap-3 mb-4">
+    {% if profile.photoUrl %}
+        <img src="{{ profile.photoUrl }}" alt="" class="rounded-circle" width="72" height="72" style="object-fit:cover">
+    {% else %}
+        <div class="rounded-circle bg-secondary-subtle d-flex align-items-center justify-content-center" style="width:72px;height:72px">{{ profile.firstName|first }}</div>
+    {% endif %}
+    <div>
+        <h1 class="h3 mb-0">{{ profile.fullName }}</h1>
+        <div class="text-secondary">{{ profile.email }}{% if profile.location %} · {{ profile.location }}{% endif %}</div>
+        <div class="small">{{ profile.roles|role_labels }}</div>
+    </div>
+    {% if canEdit %}
+        <div class="ms-auto small text-secondary" id="autosave-status">{{ 'profile.autosave_idle'|trans }}</div>
+    {% endif %}
+</div>
+
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#me">{{ 'profile.me'|trans }}</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#info">{{ 'profile.info'|trans }}</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#projects">{{ 'profile.projects'|trans }}</button></li>
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#cvs">{{ 'profile.cvs'|trans }}</button></li>
+</ul>
+
+<div class="tab-content border border-top-0 rounded-bottom p-3" id="profile-root"
+     data-autosave-url="{{ path('profile_autosave', {id: profile.id}) }}"
+     data-version="{{ profile.version }}"
+     data-editable="{{ canEdit ? '1' : '0' }}">
+
+    <div class="tab-pane fade show active" id="me">
+        {% for definition in builtins %}
+            {% set value = values[definition.id] ?? null %}
+            {% include 'profile/_field.html.twig' with {definition: definition, value: value, canEdit: canEdit} %}
+        {% endfor %}
+    </div>
+
+    <div class="tab-pane fade" id="info">
+        {% if canEdit %}
+            <div class="row g-2 mb-3">
+                <div class="col-md-5"><input class="form-control" id="info-prefix" placeholder="{{ 'attribute.lookup'|trans }}"></div>
+                <div class="col-md-4">
+                    <select class="form-select" id="info-category">
+                        <option value="">{{ 'attribute.any_category'|trans }}</option>
+                        {% for category in attribute_categories %}
+                            <option value="{{ category.value }}">{{ category.label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div id="info-results" class="list-group mb-3"></div>
+            {% if recent %}
+                <p class="small text-secondary">{{ 'attribute.recent'|trans }}:
+                    {% for item in recent %}<button type="button" class="badge text-bg-light border js-add-attr" data-id="{{ item.id }}" data-name="{{ item.name }}" data-type="{{ item.type.value }}">{{ item.name }}</button> {% endfor %}
+                </p>
+            {% endif %}
+        {% endif %}
+        <div id="info-fields">
+            {% for id, value in values %}
+                {% if not value.attribute.builtin %}
+                    {% include 'profile/_field.html.twig' with {definition: value.attribute, value: value, canEdit: canEdit, removable: canEdit} %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="projects">
+        {% if canEdit %}
+            <a class="btn btn-sm btn-primary mb-3" href="{{ path('project_new', {id: profile.id}) }}">{{ 'project.add'|trans }}</a>
+        {% endif %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle js-data-table">
+                <thead>
+                <tr>
+                    <th>{{ 'project.name'|trans }}</th>
+                    <th>{{ 'project.period'|trans }}</th>
+                    <th>{{ 'project.tags'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for project in projects %}
+                    <tr data-href="{{ canEdit ? path('project_edit', {id: project.id}) : '' }}">
+                        <td>{{ project.name }}</td>
+                        <td>{{ project.startedOn|date('Y-m') }} — {{ project.endedOn ? project.endedOn|date('Y-m') : '…' }}</td>
+                        <td>{% for tag in project.tags %}<span class="badge text-bg-secondary">{{ tag.name }}</span> {% endfor %}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="3" class="text-secondary">{{ 'empty.projects'|trans }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="cvs">
+        {% if canEdit %}
+            {{ tables.toolbar(path('cv_bulk'), [{value: 'delete', label: 'action.delete'|trans, class: 'btn-outline-danger'}]) }}
+        {% endif %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle js-data-table mb-0">
+                <thead>
+                <tr>
+                    {% if canEdit %}<th style="width:2rem"><input type="checkbox" class="form-check-input js-check-all"></th>{% endif %}
+                    <th>{{ 'position.title'|trans }}</th>
+                    <th>{{ 'cv.status'|trans }}</th>
+                    <th>{{ 'cv.likes'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for cv in cvs %}
+                    <tr data-href="{{ path('cv_show', {id: cv.id}) }}">
+                        {% if canEdit %}<td><input class="form-check-input js-row-check" type="checkbox" name="ids[]" value="{{ cv.id }}"></td>{% endif %}
+                        <td>{{ cv.position.title }}</td>
+                        <td>{{ cv.published ? 'cv.published'|trans : 'cv.draft'|trans }}</td>
+                        <td>{{ cv.likeCount }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4" class="text-secondary">{{ 'empty.cvs'|trans }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if canEdit %}
+            <div class="mt-4">
+                <h2 class="h6">{{ 'profile.badges'|trans }}</h2>
+                <img src="{{ path('profile_badges', {id: profile.id}) }}" alt="badges" class="img-fluid border rounded">
+                <div><a class="small" href="{{ path('profile_badges', {id: profile.id}) }}?download=1">{{ 'profile.download_badges'|trans }}</a></div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends 'base.html.twig' %}
+{% import '_table.html.twig' as tables %}
+{% block title %}{{ position.title }}{% endblock %}
+{% block body %}
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+        <h1 class="h3 mb-1">{{ position.title }}</h1>
+        <div class="text-secondary">{{ position.company }} · {{ position.level.label }} · {{ position.publicAccess ? 'position.public'|trans : 'position.restricted'|trans }}</div>
+    </div>
+    <div class="d-flex gap-2">
+        {% if is_granted('ROLE_RECRUITER') %}
+            <a class="btn btn-outline-secondary" href="{{ path('position_edit', {id: position.id}) }}">{{ 'action.edit'|trans }}</a>
+            <form method="post" action="{{ path('position_duplicate', {id: position.id}) }}">
+                <button class="btn btn-outline-secondary">{{ 'position.duplicate'|trans }}</button>
+            </form>
+            <a class="btn btn-outline-secondary" href="{{ path('cv_export', {id: position.id}) }}">{{ 'position.export'|trans }}</a>
+        {% endif %}
+        {% if app.user and canCreateCv %}
+            {% if ownCv %}
+                <a class="btn btn-primary" href="{{ path('cv_show', {id: ownCv.id}) }}">{{ 'cv.open'|trans }}</a>
+            {% else %}
+                <form method="post" action="{{ path('cv_create', {id: position.id}) }}">
+                    <button class="btn btn-primary">{{ 'cv.create'|trans }}</button>
+                </form>
+            {% endif %}
+        {% elseif app.user and not is_granted('ROLE_RECRUITER') %}
+            <span class="text-secondary small align-self-center">{{ 'position.no_access'|trans }}</span>
+        {% endif %}
+    </div>
+</div>
+
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#details" type="button">{{ 'position.details'|trans }}</button></li>
+    {% if is_granted('ROLE_RECRUITER') %}
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#cvs" type="button">{{ 'position.cvs'|trans }} ({{ cvTable.rows|length }})</button></li>
+    {% endif %}
+    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#discussion" type="button">{{ 'position.discussion'|trans }}</button></li>
+</ul>
+
+<div class="tab-content border border-top-0 rounded-bottom p-3">
+    <div class="tab-pane fade show active" id="details">
+        <p>{{ position.shortDescription }}</p>
+        <h2 class="h6">{{ 'position.template'|trans }}</h2>
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead><tr><th>{{ 'attribute.name'|trans }}</th><th>{{ 'attribute.category'|trans }}</th><th>{{ 'attribute.type'|trans }}</th></tr></thead>
+                <tbody>
+                {% for slot in position.templateAttributes %}
+                    <tr>
+                        <td>{{ slot.attribute.name }}</td>
+                        <td>{{ slot.attribute.category.label }}</td>
+                        <td>{{ slot.attribute.type.label }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if position.projectTags|length %}
+            <p class="mb-0">{{ 'position.project_tags'|trans }}:
+                {% for tag in position.projectTags %}<span class="badge text-bg-secondary">{{ tag.name }}</span> {% endfor %}
+                · {{ 'position.max_projects'|trans }}: {{ position.maxProjects }}
+            </p>
+        {% endif %}
+    </div>
+
+    {% if is_granted('ROLE_RECRUITER') %}
+    <div class="tab-pane fade" id="cvs">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+            <input class="form-control form-control-sm js-cv-filter" style="max-width:18rem" type="search" placeholder="{{ 'cv.filter'|trans }}">
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle js-data-table js-cv-table mb-0">
+                <thead>
+                <tr>
+                    <th data-sort-type="text" class="js-sort">{{ 'cv.candidate'|trans }}</th>
+                    {% for column in cvTable.columns %}
+                        <th data-sort-type="{{ column.type.value }}" class="js-sort">{{ column.name }}</th>
+                    {% endfor %}
+                    <th data-sort-type="numeric" class="js-sort">{{ 'cv.likes'|trans }}</th>
+                    <th data-sort-type="text" class="js-sort">{{ 'cv.updated'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in cvTable.rows %}
+                    <tr data-href="{{ path('cv_show', {id: row.cv.id}) }}">
+                        <td data-sort="{{ row.cv.owner.displayName|lower }}">{{ row.cv.owner.displayName }}</td>
+                        {% for column in cvTable.columns %}
+                            {% set cell = row.cells[column.id] %}
+                            <td data-sort="{{ cell.sort }}" class="{{ cell.empty ? 'empty-value' }}">{{ cell.empty ? 'cv.empty'|trans : cell.display }}</td>
+                        {% endfor %}
+                        <td data-sort="{{ row.cv.likeCount }}">{{ row.cv.likeCount }}</td>
+                        <td data-sort="{{ row.cv.updatedAt|date('Y-m-d H:i') }}">{{ row.cv.updatedAt|date('Y-m-d H:i') }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="{{ 3 + cvTable.columns|length }}" class="text-secondary">{{ 'empty.cvs'|trans }}</td></tr>
+                {% endfor %}
+                </tbody>
+                {% if cvTable.rows %}
+                <tfoot>
+                    <tr class="table-light">
+                        <th>{{ 'cv.aggregates'|trans }}</th>
+                        {% for column in cvTable.columns %}
+                            {% set agg = cvTable.aggregates[column.id] ?? null %}
+                            <th>
+                                {% if agg and agg.avg is defined %}
+                                    {{ 'cv.avg'|trans }} {{ agg.avg|number_format(2) }}
+                                    <span class="text-secondary fw-normal">({{ 'cv.min'|trans }} {{ agg.min|number_format(1) }} · {{ 'cv.max'|trans }} {{ agg.max|number_format(1) }})</span>
+                                {% elseif agg and agg.yes is defined %}
+                                    {{ 'yes'|trans }} {{ agg.yes }} · {{ 'no'|trans }} {{ agg.no }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </th>
+                        {% endfor %}
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="tab-pane fade" id="discussion">
+        <div id="discussion-feed" class="mb-3" data-feed-url="{{ path('discussion_feed', {id: position.id}) }}" data-recruiter="{{ is_granted('ROLE_RECRUITER') ? '1' : '0' }}"></div>
+        {% if app.user %}
+            {{ form_start(discussionForm, {action: path('discussion_post', {id: position.id})}) }}
+                {{ form_row(discussionForm.content) }}
+                <button class="btn btn-primary">{{ 'discussion.post'|trans }}</button>
+            {{ form_end(discussionForm) }}
+        {% else %}
+            <p class="text-secondary">{{ 'discussion.login'|trans }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

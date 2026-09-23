@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+{% import '_table.html.twig' as tables %}
+{% block title %}{{ 'nav.library'|trans }}{% endblock %}
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">{{ 'nav.library'|trans }}</h1>
+    <a class="btn btn-primary" href="{{ path('attribute_new') }}">{{ 'attribute.create'|trans }}</a>
+</div>
+
+<form class="row g-2 mb-3" method="get">
+    <div class="col-md-4"><input class="form-control" name="q" value="{{ q }}" placeholder="{{ 'attribute.lookup'|trans }}"></div>
+    <div class="col-md-4">
+        <select class="form-select" name="category">
+            <option value="">{{ 'attribute.any_category'|trans }}</option>
+            {% for cat in attribute_categories %}
+                <option value="{{ cat.value }}" {{ category == cat.value ? 'selected' }}>{{ cat.label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-4"><button class="btn btn-outline-secondary">{{ 'action.filter'|trans }}</button></div>
+</form>
+
+{% if recent %}
+    <p class="small text-secondary mb-2">{{ 'attribute.recent'|trans }}:
+        {% for item in recent %}<span class="badge text-bg-light border">{{ item.name }}</span> {% endfor %}
+    </p>
+{% endif %}
+
+{{ tables.toolbar(path('attribute_bulk'), [{value: 'delete', label: 'action.delete'|trans, class: 'btn-outline-danger'}]) }}
+
+<div class="table-responsive border rounded-3">
+    <table class="table table-hover align-middle mb-0 js-data-table">
+        <thead>
+        <tr>
+            <th style="width:2rem"><input type="checkbox" class="form-check-input js-check-all"></th>
+            <th>{{ 'attribute.name'|trans }}</th>
+            <th>{{ 'attribute.category'|trans }}</th>
+            <th>{{ 'attribute.type'|trans }}</th>
+            <th>{{ 'attribute.builtin'|trans }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for attribute in attributes %}
+            <tr data-href="{{ attribute.builtin ? '' : path('attribute_edit', {id: attribute.id}) }}">
+                <td><input class="form-check-input js-row-check" type="checkbox" name="ids[]" value="{{ attribute.id }}" {{ attribute.builtin ? 'disabled' }}></td>
+                <td>{{ attribute.name }}</td>
+                <td>{{ attribute.category.label }}</td>
+                <td>{{ attribute.type.label }}</td>
+                <td>{{ attribute.builtin ? 'yes'|trans : 'no'|trans }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

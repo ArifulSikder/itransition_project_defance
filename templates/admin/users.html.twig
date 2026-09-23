@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+{% import '_table.html.twig' as tables %}
+{% block title %}{{ 'nav.users'|trans }}{% endblock %}
+{% block body %}
+<h1 class="h3 mb-3">{{ 'nav.users'|trans }}</h1>
+<form class="row g-2 mb-3" method="get">
+    <div class="col-md-6"><input class="form-control" name="q" value="{{ q }}" placeholder="{{ 'search.placeholder'|trans }}"></div>
+    <div class="col-md-2"><button class="btn btn-outline-secondary">{{ 'action.filter'|trans }}</button></div>
+</form>
+
+{{ tables.toolbar(path('admin_users_bulk'), [
+    {value: 'block', label: 'admin.block'|trans, class: 'btn-outline-warning'},
+    {value: 'unblock', label: 'admin.unblock'|trans, class: 'btn-outline-success'},
+    {value: 'role_candidate', label: 'admin.role_candidate'|trans},
+    {value: 'role_recruiter', label: 'admin.role_recruiter'|trans},
+    {value: 'role_admin', label: 'admin.role_admin'|trans},
+    {value: 'remove_admin', label: 'admin.remove_admin'|trans},
+    {value: 'delete', label: 'action.delete'|trans, class: 'btn-outline-danger'},
+]) }}
+
+<div class="table-responsive border rounded-3">
+    <table class="table table-hover align-middle mb-0 js-data-table">
+        <thead>
+        <tr>
+            <th style="width:2rem"><input type="checkbox" class="form-check-input js-check-all"></th>
+            <th>{{ 'cv.candidate'|trans }}</th>
+            <th>{{ 'auth.email'|trans }}</th>
+            <th>{{ 'admin.roles'|trans }}</th>
+            <th>{{ 'admin.status'|trans }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr data-href="{{ path('profile_show', {id: user.id}) }}">
+                <td><input class="form-check-input js-row-check" type="checkbox" name="ids[]" value="{{ user.id }}"></td>
+                <td>{{ user.displayName }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.roles|role_labels }}</td>
+                <td>{{ user.blocked ? 'admin.blocked'|trans : 'admin.active'|trans }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ cv.owner.displayName }} — {{ cv.position.title }}{% endblock %}
+{% block body %}
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+    <div>
+        <h1 class="h3 mb-1">{{ cv.owner.fullName }}</h1>
+        <div class="text-secondary">{{ cv.position.title }} · {{ cv.position.company }} · {{ cv.published ? 'cv.published'|trans : 'cv.draft'|trans }} · {{ 'cv.likes'|trans }}: {{ cv.likeCount }}</div>
+    </div>
+    <div class="d-flex gap-2">
+        {% if canLike %}
+            <form method="post" action="{{ path('cv_like', {id: cv.id}) }}">
+                <button class="btn {{ liked ? 'btn-primary' : 'btn-outline-primary' }}"><i class="bi bi-heart{{ liked ? '-fill' }}"></i> {{ cv.likeCount }}</button>
+            </form>
+        {% endif %}
+        {% if canEdit and assembled.complete and not cv.published %}
+            <form method="post" action="{{ path('cv_publish', {id: cv.id}) }}">
+                <button class="btn btn-success">{{ 'cv.publish'|trans }}</button>
+            </form>
+        {% endif %}
+        {% if canEdit and cv.published %}
+            <form method="post" action="{{ path('cv_unpublish', {id: cv.id}) }}">
+                <button class="btn btn-outline-secondary">{{ 'cv.unpublish'|trans }}</button>
+            </form>
+        {% endif %}
+        <a class="btn btn-outline-secondary" href="{{ path('cv_print', {id: cv.id}) }}" target="_blank">{{ 'cv.print'|trans }}</a>
+        <a class="btn btn-outline-secondary" href="{{ path('cv_pdf', {id: cv.id}) }}">{{ 'cv.pdf'|trans }}</a>
+    </div>
+</div>
+
+<div class="cv-paper border rounded-3 p-4" id="cv-root" data-save-url="{{ path('cv_save', {id: cv.id}) }}" data-version="{{ cv.owner.version }}" data-editable="{{ canEdit ? '1' : '0' }}">
+    {% if cv.owner.photoUrl %}
+        <img src="{{ cv.owner.photoUrl }}" alt="" class="rounded-circle mb-3" width="88" height="88" style="object-fit:cover">
+    {% endif %}
+    {% for section in assembled.sections %}
+        <section class="mb-4">
+            <h2 class="h5 border-bottom pb-1">{{ section.title }}</h2>
+            {% for item in section.items %}
+                {% if canEdit %}
+                    {% include 'profile/_field.html.twig' with {definition: item.definition, value: item.value, canEdit: true, showDescription: false} %}
+                {% else %}
+                    <div class="mb-3">
+                        <div class="fw-semibold">{{ item.definition.name }}</div>
+                        {% if item.empty %}
+                            <div class="empty-value">{{ 'cv.empty'|trans }}</div>
+                        {% elseif item.definition.type.value == 'text' %}
+                            {{ item.raw|markdown_to_html }}
+                        {% elseif item.definition.type.value == 'image' %}
+                            <img src="{{ item.raw }}" alt="" class="preview-img">
+                        {% else %}
+                            <div>{{ item.display }}</div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </section>
+    {% endfor %}
+
+    {% if assembled.projects %}
+        <section>
+            <h2 class="h5 border-bottom pb-1">{{ 'profile.projects'|trans }}</h2>
+            {% for project in assembled.projects %}
+                <article class="mb-3">
+                    <div class="fw-semibold">{{ project.name }}</div>
+                    <div class="small text-secondary">{{ project.startedOn|date('Y-m') }} — {{ project.endedOn ? project.endedOn|date('Y-m') : '…' }}
+                        {% for tag in project.tags %} · {{ tag.name }}{% endfor %}
+                    </div>
+                    {{ project.description|markdown_to_html }}
+                </article>
+            {% endfor %}
+        </section>
+    {% endif %}
+    {% if canEdit %}
+        <div class="small text-secondary" id="autosave-status">{{ 'profile.autosave_idle'|trans }}</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% macro toolbar(form_action, actions) %}
+    <div class="table-toolbar mb-2" hidden>
+        <form method="post" action="{{ form_action }}" class="d-flex gap-2 align-items-center flex-wrap js-bulk-form">
+            <input type="hidden" name="_token" value="{{ csrf_token('bulk') }}">
+            <span class="text-secondary small js-selected-count">0</span>
+            {% for action in actions %}
+                <button class="btn btn-sm {{ action.class|default('btn-outline-secondary') }}" name="action" value="{{ action.value }}" type="submit">{{ action.label }}</button>
+            {% endfor %}
+        </form>
+    </div>
+{% endmacro %}

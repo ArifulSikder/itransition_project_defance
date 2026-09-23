@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+{% import '_table.html.twig' as tables %}
+{% block title %}{{ 'nav.positions'|trans }}{% endblock %}
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h1 class="h3 mb-0">{{ 'nav.positions'|trans }}</h1>
+    {% if is_granted('ROLE_RECRUITER') %}
+        <a class="btn btn-primary" href="{{ path('position_new') }}">{{ 'position.create'|trans }}</a>
+    {% endif %}
+</div>
+
+<form class="row g-2 mb-3" method="get">
+    <div class="col-md-3">
+        <select class="form-select" name="level" onchange="this.form.submit()">
+            <option value="">{{ 'position.any_level'|trans }}</option>
+            {% for level in position_levels %}
+                <option value="{{ level.value }}" {{ level.value == level|default('') ? '' : '' }} {{ app.request.query.get('level') == level.value ? 'selected' }}>{{ level.label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <input class="form-control" name="company" value="{{ company }}" placeholder="{{ 'position.company'|trans }}">
+    </div>
+    <div class="col-md-3">
+        <input class="form-control" name="tag" value="{{ tag }}" placeholder="{{ 'position.tag'|trans }}">
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-outline-secondary">{{ 'action.filter'|trans }}</button>
+    </div>
+</form>
+
+{% if is_granted('ROLE_RECRUITER') %}
+    {{ tables.toolbar(path('position_bulk'), [{value: 'delete', label: 'action.delete'|trans, class: 'btn-outline-danger'}]) }}
+{% endif %}
+
+<div class="table-responsive border rounded-3">
+    <table class="table table-hover align-middle mb-0 js-data-table">
+        <thead>
+        <tr>
+            {% if is_granted('ROLE_RECRUITER') %}<th style="width:2rem"><input type="checkbox" class="form-check-input js-check-all"></th>{% endif %}
+            <th>{{ knp_pagination_sortable(pagination, 'position.title'|trans, 'p.title') }}</th>
+            <th>{{ knp_pagination_sortable(pagination, 'position.company'|trans, 'p.company') }}</th>
+            <th>{{ knp_pagination_sortable(pagination, 'position.level'|trans, 'p.level') }}</th>
+            <th>{{ knp_pagination_sortable(pagination, 'position.cvs'|trans, 'p.cvCount') }}</th>
+            <th>{{ knp_pagination_sortable(pagination, 'position.updated'|trans, 'p.updatedAt') }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for position in pagination %}
+            <tr data-href="{{ path('position_show', {id: position.id}) }}">
+                {% if is_granted('ROLE_RECRUITER') %}
+                    <td><input class="form-check-input js-row-check" type="checkbox" name="ids[]" value="{{ position.id }}" form="unused"></td>
+                {% endif %}
+                <td>{{ position.title }}</td>
+                <td>{{ position.company }}</td>
+                <td>{{ position.level.label }}</td>
+                <td>{{ position.cvCount }}</td>
+                <td>{{ position.updatedAt|date('Y-m-d') }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="6" class="text-secondary">{{ 'empty.positions'|trans }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="mt-3">{{ knp_pagination_render(pagination) }}</div>
+{% endblock %}

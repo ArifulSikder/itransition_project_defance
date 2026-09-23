@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ cv.owner.fullName }} — {{ cv.position.title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @media print { .no-print { display: none; } }
+        .empty-value { color: #dc3545; }
+        body { padding: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="h3">{{ cv.owner.fullName }}</h1>
+            <p>{{ cv.position.title }} · {{ cv.position.company }}</p>
+            <p>{{ cv.owner.location }} · {{ cv.owner.email }}</p>
+        </div>
+        <div class="text-center">
+            <img src="{{ qr }}" alt="QR" width="120" height="120">
+            <div class="small">{{ url }}</div>
+        </div>
+    </div>
+    {% for section in assembled.sections %}
+        <h2 class="h5 mt-4">{{ section.title }}</h2>
+        {% for item in section.items %}
+            <p><strong>{{ item.definition.name }}:</strong>
+                {% if item.empty %}<span class="empty-value">Missing</span>{% else %}{{ item.display }}{% endif %}
+            </p>
+        {% endfor %}
+    {% endfor %}
+    {% if assembled.projects %}
+        <h2 class="h5 mt-4">Projects</h2>
+        {% for project in assembled.projects %}
+            <p><strong>{{ project.name }}</strong> ({{ project.startedOn|date('Y-m') }} — {{ project.endedOn ? project.endedOn|date('Y-m') : 'present' }})</p>
+            {{ project.description|markdown_to_html }}
+        {% endfor %}
+    {% endif %}
+    <p class="no-print mt-4">
+        <button class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button>
+        <a class="btn btn-outline-secondary" href="{{ path('cv_pdf', {id: cv.id}) }}">Download PDF</a>
+    </p>
+</body>
+</html>

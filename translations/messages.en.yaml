@@ -1,0 +1,169 @@
+nav:
+    home: Home
+    positions: Positions
+    library: Attribute library
+    profile: Profile
+    users: Users
+    login: Sign in
+    register: Register
+    logout: Sign out
+    theme: Toggle theme
+home:
+    title: CV Hub
+    hello: Hello, world — CV Hub is running.
+    lead: Recruiters design position templates. Candidates fill reusable attributes and generate tailored CVs.
+    latest: Latest positions
+    popular: Most popular positions
+    tags: Technology tags
+stats:
+    cvs_24h: CVs created in the last 24 hours
+    positions: Positions
+    candidates: Candidates
+    recruiters: Recruiters
+    cvs_total: Submitted CVs
+search:
+    placeholder: Search positions, people, attributes…
+    title: Search results
+    type: Type
+    result: Result
+    rank: Rank
+    likes: Likes
+    empty: Nothing matched that query.
+    hint: Type a phrase in the header search.
+    types:
+        position: Position
+        cv: CV
+        user: Person
+        attribute: Attribute
+auth:
+    login: Sign in
+    register: Create an account
+    email: Email
+    password: Password
+    signin: Sign in
+    create: Create account
+    google: Continue with Google
+    github: Continue with GitHub
+    no_account: No account yet?
+    confirm_required: Confirm your email before signing in.
+    blocked: This account is blocked.
+    check_email: Check your email
+    check_email_body: We sent a confirmation link to %email%. Open it to activate your account.
+    dev_link: Mail is not configured, so here is the confirmation link
+    resend: Need another confirmation email?
+    resend_button: Resend
+    confirmed: Email confirmed. You are signed in.
+    invalid_token: That confirmation link is invalid or already used.
+action:
+    save: Save
+    edit: Edit
+    delete: Delete
+    remove: Remove
+    filter: Filter
+position:
+    title: Title
+    company: Company
+    level: Level
+    updated: Updated
+    cvs: CVs
+    create: New position
+    duplicate: Duplicate
+    export: Export Excel
+    public: Public
+    restricted: Restricted
+    details: Details
+    discussion: Discussion
+    template: CV template
+    template_help: Look up attributes by prefix and category, then add them to this position.
+    rules: Access rules
+    add_rule: Add rule
+    project_tags: Project tags
+    max_projects: Max projects
+    any_level: Any level
+    tag: Tag
+    no_access: This position is restricted by your current profile values.
+attribute:
+    name: Name
+    category: Category
+    type: Type
+    builtin: Built-in
+    create: New attribute
+    lookup: Start typing a name…
+    any_category: Any category
+    recent: Recently used
+profile:
+    me: Me
+    info: Info
+    projects: Projects
+    cvs: CVs
+    autosave_idle: All changes saved
+    badges: Badges
+    download_badges: Download SVG
+badge:
+    projects: '%count% projects'
+    cvs: '%count% CVs'
+    likes: '%count% likes'
+    first: First CV
+    published: Published
+role:
+    admin: Administrator
+    recruiter: Recruiter
+    candidate: Candidate
+    user: User
+project:
+    add: Add project
+    name: Name
+    period: Period
+    tags: Tags
+cv:
+    open: Open my CV
+    create: Generate CV
+    candidate: Candidate
+    likes: Likes
+    updated: Updated
+    status: Status
+    published: Published
+    draft: Draft
+    publish: Publish
+    unpublish: Unpublish
+    print: Print
+    pdf: Download PDF
+    empty: Missing value
+    filter: Filter CVs…
+    aggregates: Aggregates
+    avg: Avg
+    min: min
+    max: max
+discussion:
+    post: Post
+    login: Sign in to join the discussion.
+admin:
+    block: Block
+    unblock: Unblock
+    role_candidate: Make candidate
+    role_recruiter: Make recruiter
+    role_admin: Make admin
+    remove_admin: Remove admin
+    roles: Roles
+    status: Status
+    blocked: Blocked
+    active: Active
+empty:
+    positions: No positions yet.
+    cvs: No CVs to show.
+    tags: No tags yet.
+    projects: No projects yet.
+image:
+    drop: Drop an image here or click to upload
+yes: Yes
+no: No
+lock:
+    conflict: This record was changed by someone else. Reload and try again — your on-screen edits were not saved over the newer version.
+    reload: Reload
+validation:
+    too_short: Value is too short.
+    too_long: Value is too long.
+    pattern: Value does not match the required pattern.
+    numeric: Value must be numeric.
+    min: Value is below the minimum.
+    max: Value is above the maximum.

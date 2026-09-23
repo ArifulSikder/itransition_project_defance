@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'auth.login'|trans }}{% endblock %}
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <h1 class="h3 mb-3">{{ 'auth.login'|trans }}</h1>
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData) }}</div>
+        {% endif %}
+        <form method="post">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            <div class="mb-3">
+                <label class="form-label" for="username">{{ 'auth.email'|trans }}</label>
+                <input class="form-control" type="email" id="username" name="_username" value="{{ last_username }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="password">{{ 'auth.password'|trans }}</label>
+                <input class="form-control" type="password" id="password" name="_password" required>
+            </div>
+            <button class="btn btn-primary w-100" type="submit">{{ 'auth.signin'|trans }}</button>
+        </form>
+        <div class="d-grid gap-2 mt-3">
+            <a class="btn btn-outline-danger" href="{{ path('connect_google') }}"><i class="bi bi-google"></i> {{ 'auth.google'|trans }}</a>
+            <a class="btn btn-outline-dark" href="{{ path('connect_github') }}"><i class="bi bi-github"></i> {{ 'auth.github'|trans }}</a>
+        </div>
+        <p class="mt-3 small">{{ 'auth.no_account'|trans }} <a href="{{ path('app_register') }}">{{ 'nav.register'|trans }}</a></p>
+        <form class="mt-3" method="post" action="{{ path('app_resend_confirmation') }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('resend') }}">
+            <label class="form-label small" for="resend-email">{{ 'auth.resend'|trans }}</label>
+            <div class="input-group">
+                <input class="form-control" type="email" id="resend-email" name="email" value="{{ last_username }}" required>
+                <button class="btn btn-outline-secondary">{{ 'auth.resend_button'|trans }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

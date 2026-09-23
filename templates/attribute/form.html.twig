@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'attribute.create'|trans }}{% endblock %}
+{% block body %}
+<h1 class="h3 mb-3">{{ attribute.id ? attribute.name : 'attribute.create'|trans }}</h1>
+{{ form_start(form) }}
+    <input type="hidden" name="version" value="{{ attribute.version }}">
+    <div class="row">
+        <div class="col-md-6">{{ form_row(form.name) }}</div>
+        <div class="col-md-3">{{ form_row(form.category) }}</div>
+        <div class="col-md-3">{{ form_row(form.type) }}</div>
+        <div class="col-12">{{ form_row(form.description) }}</div>
+        <div class="col-12">{{ form_row(form.optionsText) }}</div>
+        <div class="col-md-3">{{ form_row(form.minLength) }}</div>
+        <div class="col-md-3">{{ form_row(form.maxLength) }}</div>
+        <div class="col-md-6">{{ form_row(form.pattern) }}</div>
+        <div class="col-md-3">{{ form_row(form.minValue) }}</div>
+        <div class="col-md-3">{{ form_row(form.maxValue) }}</div>
+    </div>
+    <button class="btn btn-primary">{{ 'action.save'|trans }}</button>
+{{ form_end(form) }}
+{% endblock %}
