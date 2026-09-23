@@ -8,9 +8,6 @@ Command reference (setup, server, migrations up and down, fixtures): [COMMANDS.m
 
 ```bash
 composer install
-docker compose up -d database          # PostgreSQL (preferred)
-# or skip Docker: the app can also run on a local SQLite file via .env.local
-
 php bin/console doctrine:database:create --if-not-exists
 php bin/console doctrine:schema:create
 php bin/console doctrine:migrations:migrate --no-interaction   # adds the Postgres search index
@@ -19,8 +16,6 @@ php -S 127.0.0.1:8000 -t public
 ```
 
 Open http://127.0.0.1:8000 and the static health check at http://127.0.0.1:8000/hello.html
-
-Or run the whole stack with `docker compose up --build`.
 
 ## Demo accounts
 

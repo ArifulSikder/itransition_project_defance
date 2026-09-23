@@ -1,0 +1,90 @@
+name: Deploy to cPanel
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-cpanel
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      PHP_VERSION: '8.2'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: ctype, iconv, mbstring, xml, intl, gd, zip, curl, pdo_mysql
+          coverage: none
+          tools: composer
+
+      - name: Prepare build env
+        run: |
+          cat > .env << 'EOF'
+          APP_ENV=prod
+          APP_DEBUG=0
+          APP_SECRET=build-only-not-uploaded
+          DEFAULT_URI=http://localhost
+          DATABASE_URL="mysql://build:build@127.0.0.1:3306/build?serverVersion=8.0&charset=utf8mb4"
+          MAILER_DSN=null://null
+          GOOGLE_CLIENT_ID=build
+          GOOGLE_CLIENT_SECRET=build
+          GITHUB_CLIENT_ID=build
+          GITHUB_CLIENT_SECRET=build
+          CLOUDINARY_CLOUD_NAME=build
+          CLOUDINARY_UPLOAD_PRESET=build
+          EOF
+
+      - name: Install Composer deps
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist
+
+      - name: Compile AssetMapper files
+        run: php bin/console asset-map:compile --env=prod --no-debug
+
+      - name: Check FTP credentials
+        env:
+          FTP_HOST: ${{ secrets.CVHUB_FTP_HOST || vars.CVHUB_FTP_HOST }}
+          FTP_USER: ${{ secrets.CVHUB_FTP_USER || vars.CVHUB_FTP_USER }}
+          FTP_PW: ${{ secrets.CVHUB_FTP_PW || vars.CVHUB_FTP_PW }}
+        run: |
+          if [ -z "$FTP_HOST" ] || [ -z "$FTP_USER" ] || [ -z "$FTP_PW" ]; then
+            echo "Missing FTP credentials."
+            echo "Add CVHUB_FTP_HOST, CVHUB_FTP_USER, and CVHUB_FTP_PW under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.CVHUB_FTP_HOST || vars.CVHUB_FTP_HOST }}
+          username: ${{ secrets.CVHUB_FTP_USER || vars.CVHUB_FTP_USER }}
+          password: ${{ secrets.CVHUB_FTP_PW || vars.CVHUB_FTP_PW }}
+          protocol: ftp
+          port: 21
+          server-dir: ${{ vars.CVHUB_FTP_DIR || '/' }}
+          local-dir: ./
+          timeout: 600000
+          dangerous-clean-slate: false
+          state-name: sync-state.json
+          log-level: standard
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/.env**
+            **/var/**
+            **/tests/**
+            **/node_modules/**
+            **/phpunit*
+            **/README.md
+            **/COMMANDS.md
