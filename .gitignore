@@ -17,3 +17,4 @@
 
 /var/*.db
 /var/*.db-journal
+.env
