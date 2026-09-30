@@ -5,9 +5,6 @@ namespace App\Repository;
 use App\Entity\SearchDocument;
 use App\Enum\SearchType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\DBAL\ParameterType;
-use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
-use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -50,68 +47,53 @@ class SearchDocumentRepository extends ServiceEntityRepository
     }
 
     /**
-     * Native full-text search: MySQL MATCH ... AGAINST, or PostgreSQL tsvector.
-     * Results are ranked by the engine. This is not a table scan.
+     * MySQL search through Doctrine. Each word must appear in the title or body.
+     * Title matches rank above body-only matches.
      *
-     * @return list<array{id:int|string,type:string,entity_id:int|string,title:string,route:string|null,rank:float|string}>
+     * @return list<array{id: int, type: string, entity_id: int, title: string, route: string|null, rank: float}>
      */
     public function fullTextSearch(string $query, int $limit = 40): array
     {
         $query = trim($query);
-        if ($query === '') {
+        $terms = preg_split('/\s+/u', $query) ?: [];
+        $terms = array_values(array_filter(
+            $terms,
+            static fn (string $term): bool => $term !== '',
+        ));
+        if ($terms === []) {
             return [];
         }
 
-        $conn = $this->getEntityManager()->getConnection();
-        $platform = $conn->getDatabasePlatform();
-        $types = ['limit' => ParameterType::INTEGER];
-
-        if ($platform instanceof PostgreSQLPlatform) {
-            $sql = <<<SQL
-                SELECT sd.id, sd.type, sd.entity_id, sd.title, sd.route,
-                       ts_rank(to_tsvector('english', sd.title || ' ' || sd.body), plainto_tsquery('english', :q)) AS rank
-                FROM search_document sd
-                WHERE to_tsvector('english', sd.title || ' ' || sd.body) @@ plainto_tsquery('english', :q)
-                ORDER BY rank DESC, sd.title ASC
-                LIMIT :limit
-            SQL;
-
-            return $conn->fetchAllAssociative($sql, ['q' => $query, 'limit' => $limit], $types);
+        $qb = $this->createQueryBuilder('s');
+        foreach ($terms as $index => $term) {
+            $parameter = 'term'.$index;
+            $qb->andWhere(sprintf('LOWER(s.title) LIKE :%1$s OR LOWER(s.body) LIKE :%1$s', $parameter))
+                ->setParameter($parameter, '%'.mb_strtolower($term).'%');
         }
 
-        if ($platform instanceof AbstractMySQLPlatform) {
-            $terms = preg_split('/\s+/u', $query) ?: [];
-            $boolean = [];
-            foreach ($terms as $term) {
-                $term = preg_replace('/[^\p{L}\p{N}_]+/u', '', $term) ?? '';
-                if (mb_strlen($term) >= 3) {
-                    $boolean[] = '+'.$term.'*';
-                }
-            }
-            if ($boolean === []) {
-                return [];
-            }
+        /** @var list<SearchDocument> $documents */
+        $documents = $qb
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
 
-            $sql = <<<SQL
-                SELECT sd.id, sd.type, sd.entity_id, sd.title, sd.route,
-                       MATCH(sd.title, sd.body) AGAINST (:q IN BOOLEAN MODE) AS rank
-                FROM search_document sd
-                WHERE MATCH(sd.title, sd.body) AGAINST (:q IN BOOLEAN MODE)
-                ORDER BY rank DESC, sd.title ASC
-                LIMIT :limit
-            SQL;
-
-            return $conn->fetchAllAssociative($sql, ['q' => implode(' ', $boolean), 'limit' => $limit], $types);
+        $needle = mb_strtolower($query);
+        $hits = [];
+        foreach ($documents as $document) {
+            $hits[] = [
+                'id' => (int) $document->getId(),
+                'type' => $document->getType()->value,
+                'entity_id' => $document->getEntityId(),
+                'title' => $document->getTitle(),
+                'route' => $document->getRoute(),
+                'rank' => str_contains(mb_strtolower($document->getTitle()), $needle) ? 2.0 : 1.0,
+            ];
         }
 
-        return $conn->fetchAllAssociative(
-            'SELECT id, type, entity_id, title, route, 1.0 AS rank
-             FROM search_document
-             WHERE title LIKE :q OR body LIKE :q
-             ORDER BY title ASC
-             LIMIT :limit',
-            ['q' => $query.'%', 'limit' => $limit],
-            $types,
-        );
+        usort($hits, static function (array $left, array $right): int {
+            return $right['rank'] <=> $left['rank'] ?: strcmp($left['title'], $right['title']);
+        });
+
+        return $hits;
     }
 }

@@ -3,7 +3,6 @@
 /.env.local
 /.env.local.php
 /.env.*.local
-/.env
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
@@ -17,4 +16,5 @@
 
 /var/*.db
 /var/*.db-journal
-.env
+config.bat
+node_modules
